@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sessionStorage as storage } from "js-storage";
+import Header from "./header";
 
 const Property = () => {
   const { search } = useLocation();
@@ -12,12 +13,14 @@ const Property = () => {
   );
 
   const [loaded, setLoaded] = useState(!!storage.get(property_id));
-  const [property, setProperty] = useState(storage.get(property_id));
+  const [property, setProperty] = useState(
+    storage.get(property_id) || { sales_history: [] }
+  );
 
   useEffect(() => {
     if (!loaded)
       axios
-        .get("/api/property", { params: { url: details_url[0] } })
+        .get("/property", { params: { url: details_url[0] } })
         .then(({ data }) => {
           setLoaded(true);
           storage.set({ [property_id]: data });
@@ -29,7 +32,6 @@ const Property = () => {
 
   const handleResearch = () => {
     navigate("/");
-    storage.removeAll();
   };
 
   const handleBack = () => {
@@ -38,117 +40,145 @@ const Property = () => {
 
   return (
     <>
+      <Header />
       {loaded ? (
-        <div className="container mx-auto">
-          <div className="mt-10">
-            <div className="mt-10 flex justify-between">
-              <a
-                target="_blank"
-                className="text-3xl underline text-blue-500 flex-1"
-                href={property.record_card_link}
-                rel="noreferrer"
-              >
-                Record Card
-              </a>
+        <div className="container mx-auto mt-10">
+          <div className="mt-6 shadow-xl p-5">
+            <div className="px-4 sm:px-0 flex">
+              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline flex-1">
+                Property Information
+              </h3>
               <button
-                className="bg-white text-blue-800 font-semibold py-2 px-4 border border-gray-400 rounded shadows hover:bg-gray-100D mr-2"
-                onClick={handleResearch}
+                type="submit"
+                className="block rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Research
-              </button>
-              <button
-                className="bg-white text-blue-800 font-semibold py-2 px-4 border border-gray-400 rounded shadows hover:bg-gray-100D mr-2"
-                onClick={handleBack}
-              >
-                Back
-              </button>
-              <button className="bg-white text-blue-800 font-semibold py-2 px-4 border border-gray-400 rounded shadows hover:bg-gray-100D mr-2">
                 Report
               </button>
             </div>
-            <div className="grid grid-cols-8 gap-4">
-              <div className="col-start-1 col-span-8">
-                <table className="w-full">
-                  <tbody>
-                    <tr>
-                      <td className="py-5" colSpan={2}>
-                        <h1 className="text-3xl underline">Main Information</h1>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="align-top">
-                        <h1 className="text-xl">
-                          Property Address: {property.address}
-                        </h1>
-                      </td>
-                      <td className="align-top">
-                        <h1 className="text-xl">
-                          Property Parcel: {property.parcel}
-                        </h1>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="align-top">
-                        <h1 className="text-xl">
-                          Owner Name: {property.owner}
-                        </h1>
-                      </td>
-                      <td className="align-top">
-                        <h1 className="text-xl">
-                          Owner Address: {property.owner_address}
-                        </h1>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="col-start-1 col-end-8">
-                <div className="mt-10 flex items-end">
-                  <h1 className="text-3xl underline">
-                    Total and most recent tax
-                  </h1>
-                  <div className="ml-8 text-2xl">{property.tax}</div>
+            <div className="mt-3 border-t border-gray-100">
+              <dl className="divide-y divide-gray-100">
+                <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="text-sm font-medium leading-6 text-gray-900">
+                    Address
+                  </dt>
+                  <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <span className="flex-grow">{property.address}</span>
+                  </dd>
                 </div>
-              </div>
-              <div className="col-start-1 col-end-8">
-                <div className="mt-10 flex items-end">
-                  <h1 className="text-3xl underline">
-                    Total and most assessed value
-                  </h1>
-                  <div className="ml-8 text-2xl">{property.assessed_value}</div>
+                <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="text-sm font-medium leading-6 text-gray-900">
+                    Parcel
+                  </dt>
+                  <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <span className="flex-grow">{property.parcel}</span>
+                  </dd>
                 </div>
-              </div>
-              <div className="col-start-1 col-end-8">
-                <div className="mt-10">
-                  <h1 className="text-3xl mb-10 underline">Sales History</h1>
-                  <table className="w-full">
-                    <thead>
-                      <tr>
-                        {Object.keys(property.sales_history[0]).map(
-                          (header) => (
-                            <th key={header}>{header.toUpperCase()}</th>
-                          )
-                        )}
+                <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="text-sm font-medium leading-6 text-gray-900">
+                    Owner Name
+                  </dt>
+                  <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <span className="flex-grow">{property.owner}</span>
+                    <span className="ml-4 flex-shrink-0">
+                      <button
+                        type="button"
+                        className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500"
+                      >
+                        Detailed Owner Info
+                      </button>
+                    </span>
+                  </dd>
+                </div>
+                <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="text-sm font-medium leading-6 text-gray-900">
+                    Owner Address
+                  </dt>
+                  <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <span className="flex-grow">{property.owner_address}</span>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+          <div className="mt-6 shadow-xl p-5">
+            <div className="px-4 sm:px-0">
+              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline">
+                Total and most recent assessed value of property
+              </h3>
+            </div>
+            <div className="mt-3 border-t border-gray-100">
+              <dl className="divide-y divide-gray-100">
+                <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="text-sm font-medium leading-6 text-gray-900">
+                    Value
+                  </dt>
+                  <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <span className="flex-grow">{property.assessed_value}</span>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+          <div className="mt-6 shadow-xl p-5">
+            <div className="px-4 sm:px-0">
+              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline">
+                Total and most recent tax Information
+              </h3>
+            </div>
+            <div className="mt-3 border-t border-gray-100">
+              <dl className="divide-y divide-gray-100">
+                <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="text-sm font-medium leading-6 text-gray-900">
+                    Value
+                  </dt>
+                  <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <span className="flex-grow">{property.tax}</span>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+          <div className="mt-6 shadow-xl p-5">
+            <div className="px-4 sm:px-0">
+              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline">
+                Sales history
+              </h3>
+            </div>
+            <div className="mt-3 border-t border-gray-100">
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    {Object.keys(property.sales_history[0]).map((header) => (
+                      <th
+                        className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                        key={header}
+                      >
+                        {header.toUpperCase()}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {property.sales_history.map(
+                    ({ owner, sale_date, book_page, sale_price }, index) => (
+                      <tr key={index}>
+                        <td className="px-3 py-2 whitespace-nowrap border-b border-gray-300">
+                          {owner}
+                        </td>
+                        <td className="px-3 py-2 whitespace-nowrap border-b border-gray-300">
+                          {sale_date}
+                        </td>
+                        <td className="px-3 py-2 whitespace-nowrap border-b border-gray-300">
+                          {book_page}
+                        </td>
+                        <td className="px-3 py-2 whitespace-nowrap border-b border-gray-300">
+                          {sale_price}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {property.sales_history.map(
-                        (
-                          { owner, sale_date, book_page, sale_price },
-                          index
-                        ) => (
-                          <tr key={index}>
-                            <td className="text-center">{owner}</td>
-                            <td className="text-center">{sale_date}</td>
-                            <td className="text-center">{book_page}</td>
-                            <td className="text-center">{sale_price}</td>
-                          </tr>
-                        )
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                    )
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

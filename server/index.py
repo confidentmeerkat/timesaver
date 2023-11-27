@@ -78,7 +78,7 @@ def getProperties(propertyAddress: Union[str, None] = None):
             property["details_link"] = Base_URL + columns[5].find("a")["href"].strip()
             properties.append(property)
 
-        if len(rows) == 1:
+        if len(rows) <= 1:
             break
         else:
             page += 40
