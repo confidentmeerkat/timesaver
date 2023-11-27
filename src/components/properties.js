@@ -19,57 +19,57 @@ const Properties = () => {
     <>
       <Header />
       <div className="container mx-auto mt-10">
-        <table className="min-w-full bg-white">
+        <table class="border-collapse table-auto w-full text-sm">
           <thead>
             <tr>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[5%]">
+              <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left">
                 ID
               </th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[20%]">
+              <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left">
                 Location
               </th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[20%]">
+              <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left">
                 Owner
               </th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[10%]">
+              <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left">
                 Parcel
               </th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[10%]"></th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[10%]"></th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[15%]">
+              <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left"></th>
+              <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left"></th>
+              <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left">
                 Details
               </th>
-              <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[10%]">
+              <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left">
                 Viewed
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="bg-white">
             {properties.map(
               (
                 { parcel, location, owner, extra_1, extra_2, details_link },
                 index
               ) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap border-b border-gray-300 w-[5%]">
+                  <td className="border-b border-slate-100 p-4">
                     {index + 1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap border-b border-gray-300 w-[20%]">
+                  <td className="border-b border-slate-100 p-4">
                     {location}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap border-b border-gray-300 w-[20%]">
+                  <td className="border-b border-slate-100 p-4">
                     {owner}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap border-b border-gray-300 w-[10%]">
+                  <td className="border-b border-slate-100 p-4">
                     {parcel}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap border-b border-gray-300 w-[10%]">
+                  <td className="border-b border-slate-100 p-4">
                     {extra_1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap border-b border-gray-300 w-[10%]">
+                  <td className="border-b border-slate-100 p-4">
                     {extra_2}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap border-b border-gray-300 w-[15%]">
+                  <td className="border-b border-slate-100 p-4">
                     <button
                       className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
                       onClick={handleShowDetail(details_link, index)}
@@ -77,7 +77,7 @@ const Properties = () => {
                       Details
                     </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap border-b border-gray-300 w-[10%]">
+                  <td className="border-b border-slate-100 p-4">
                     {storage.get(index) && (
                       <svg
                         fill="#000000"
