@@ -29,7 +29,7 @@ const Home = () => {
       storage.set({ name, email, propertyAddress });
       buyerInfoHandler({ name, email, propertyAddress });
       axios
-        .get("/properties", { params: { propertyAddress } })
+        .get("/api/properties", { params: { propertyAddress } })
         .then(({ data }) => {
           navigate("/properties");
           storage.set({ properties: JSON.stringify(data) });

@@ -20,7 +20,7 @@ const Property = () => {
   useEffect(() => {
     if (!loaded)
       axios
-        .get("/property", { params: { url: details_url[0] } })
+        .get("/api/property", { params: { url: details_url[0] } })
         .then(({ data }) => {
           setLoaded(true);
           storage.set({ [property_id]: data });
