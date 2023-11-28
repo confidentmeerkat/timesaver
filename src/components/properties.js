@@ -71,7 +71,7 @@ const Properties = () => {
                   </td>
                   <td className="border-b border-slate-100 p-4">
                     <button
-                      className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+                      className="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-4 border rounded"
                       onClick={handleShowDetail(details_link, index)}
                     >
                       Details
