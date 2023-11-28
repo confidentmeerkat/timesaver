@@ -50,7 +50,7 @@ const Property = () => {
               </h3>
               <button
                 type="submit"
-                className="block rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="block rounded-md bg-gray-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
               >
                 Report
               </button>
@@ -82,7 +82,7 @@ const Property = () => {
                     <span className="ml-4 flex-shrink-0">
                       <button
                         type="button"
-                        className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500"
+                        className="rounded-md bg-white font-medium text-gray-600 hover:text-gray-500"
                       >
                         Detailed Owner Info
                       </button>
