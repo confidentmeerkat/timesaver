@@ -28,14 +28,12 @@ const Property = () => {
         });
   }, [details_url]);
 
-  const navigate = useNavigate();
-
-  const handleResearch = () => {
-    navigate("/");
-  };
-
-  const handleBack = () => {
-    navigate("/properties");
+  const handleGetDeeds = () => {
+    axios
+      .get("/api/deeds", { params: { lastName: property.owner } })
+      .then(({ data }) => {
+        console.log(data);
+      });
   };
 
   return (
@@ -83,8 +81,9 @@ const Property = () => {
                       <button
                         type="button"
                         className="rounded-md bg-white font-medium text-gray-600 hover:text-gray-500"
+                        onClick={handleGetDeeds}
                       >
-                        Detailed Owner Info
+                        Deeds
                       </button>
                     </span>
                   </dd>

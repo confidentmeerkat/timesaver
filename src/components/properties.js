@@ -19,7 +19,7 @@ const Properties = () => {
     <>
       <Header />
       <div className="container mx-auto mt-10">
-        <table class="border-collapse table-auto w-full text-sm">
+        <table className="border-collapse table-auto w-full text-sm">
           <thead>
             <tr>
               <th className="border-b font-medium p-4 pr-8 pt-0 pb-3 text-gray-600 text-left">
@@ -44,7 +44,7 @@ const Properties = () => {
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white">
+          <tbody className="bg-white">
             {properties.map(
               (
                 { parcel, location, owner, extra_1, extra_2, details_link },
