@@ -4,18 +4,23 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 Base_URL = "https://www.townofbarnstable.us/Departments/Assessing/Property_Values/"
 
 
 @router.get("/properties")
-def getProperties(propertyAddress: Union[str, None] = None):
+def getProperties(
+    street: Union[str, None] = None,
+    streetNum: Union[str, None] = None,
+    city: Union[str, None] = None,
+    state: Union[str, None] = None,
+):
     properties = []
     page = 0
 
     while True:
-        url = f"https://www.townofbarnstable.us/Departments/Assessing/Property_Values/Property-Look-Up.asp?type=3&searching=yes&searchtype=address&mappar=&ownname=&streetno=&streetname={propertyAddress}&Start={page}"
+        url = f"https://www.townofbarnstable.us/Departments/Assessing/Property_Values/Property-Look-Up.asp?type=3&searching=yes&searchtype=address&mappar=&ownname=&streetno={streetNum}&streetname={street}&Start={page}"
         response = requests.get(url)
         soup = BeautifulSoup(response.text, "html.parser")
         table = soup.find("table", {"class": "parcelsearch"})
@@ -116,33 +121,22 @@ def getProperty(url: Union[str, None] = None):
 
 @router.get("/deeds")
 def getDeeds(
-    firstName: Union[str, None] = None,
     lastName: Union[str, None] = None,
-    town: Union[str, None] = None,
 ):
-    towns = [
-        "Barnstable",
-        "Bourne",
-        "Brewster",
-        "Chatham",
-        "County",
-        "Dennis",
-        "Eastham",
-        "Falmouth",
-        "Harwich",
-        "Mashpee",
-        "Orleans",
-        "Provincetown",
-        "Sandwich",
-        "Truro",
-        "Various",
-        "Wellfleet",
-        "Yarmouth",
-    ]
-    for town in towns:
-        print(town)
-
     response = requests.get(
-        f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName}&W9GNM={firstName}&W9IXTP=A&W9ABR=DD&W9TOWN={town}&W9INQ=AY&W9FDTA=&W9TDTA=&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
+        f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName}&W9GNM=&W9IXTP=A&W9ABR=DD&W9TOWN=*ALL&W9INQ=AY&W9FDTA=&W9TDTA=&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
     )
     soup = BeautifulSoup(response.text, "html.parser")
+    registry_records_table = (
+        soup.find("form", {"id": "search"})
+        .find("div", {"class": "mainContent"})
+        .find("table", recursive=False)
+    )
+    if len(registry_records_table.find_all("tr")) < 2:
+        result = "There is no result"
+        response = requests.get(
+            f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SN8={lastName}&W9GN8=&W9IXTP=A&W9SN8B=&W9GN8B=&W9IXTPB=+&W9ABR=DD&W9TOWN=*ALL&W9FDTA=&W9TDTA=&WSHTNM=WW401L00&WSIQTP=LC01LP&WSWVER=2#schTerms"
+        )
+        soup = BeautifulSoup(response.text, "html.parser")
+    else:
+        result = f"There are {len(registry_records_table.find_all('tr')) - 2} results"
