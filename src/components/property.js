@@ -30,7 +30,12 @@ const Property = () => {
 
   const handleGetDeeds = () => {
     axios
-      .get("/api/deeds", { params: { lastName: property.owner } })
+      .get("/api/deeds", {
+        params: {
+          lastName: property.owner,
+          deed_date: property.sales_history[0].sale_date,
+        },
+      })
       .then(({ data }) => {
         console.log(data);
       });
@@ -43,7 +48,7 @@ const Property = () => {
         <div className="container mx-auto mt-10">
           <div className="mt-6 shadow-xl p-5">
             <div className="px-4 sm:px-0 flex">
-              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline flex-1">
+              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline flex-1 cursor-pointer">
                 Property Information
               </h3>
               <button
@@ -55,6 +60,21 @@ const Property = () => {
             </div>
             <div className="mt-3 border-t border-gray-100">
               <dl className="divide-y divide-gray-100">
+                <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="text-sm font-medium leading-6 text-gray-900">
+                    Report Card
+                  </dt>
+                  <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <span className="flex-grow">
+                      <a target="_blank" href={property.record_card_link}>
+                        <img
+                          src="https://www.townofbarnstable.us/Departments/Assessing/Property_Values/propcard.png"
+                          alt="Report Card"
+                        />
+                      </a>
+                    </span>
+                  </dd>
+                </div>
                 <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                   <dt className="text-sm font-medium leading-6 text-gray-900">
                     Address
@@ -101,7 +121,7 @@ const Property = () => {
           </div>
           <div className="mt-6 shadow-xl p-5">
             <div className="px-4 sm:px-0">
-              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline">
+              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline cursor-pointer">
                 Total and most recent assessed value of property
               </h3>
             </div>
@@ -120,7 +140,7 @@ const Property = () => {
           </div>
           <div className="mt-6 shadow-xl p-5">
             <div className="px-4 sm:px-0">
-              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline">
+              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline cursor-pointer">
                 Total and most recent tax Information
               </h3>
             </div>
@@ -139,7 +159,7 @@ const Property = () => {
           </div>
           <div className="mt-6 shadow-xl p-5">
             <div className="px-4 sm:px-0">
-              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline">
+              <h3 className="text-2xl font-semibold leading-7 text-gray-900 underline cursor-pointer">
                 Sales history
               </h3>
             </div>

@@ -3,10 +3,14 @@ from typing import Union
 import requests
 from bs4 import BeautifulSoup
 import re
+from datetime import datetime
 
 router = APIRouter(prefix="/api")
 
-Base_URL = "https://www.townofbarnstable.us/Departments/Assessing/Property_Values/"
+TownOfBarnStable_Base_URL = (
+    "https://www.townofbarnstable.us/Departments/Assessing/Property_Values/"
+)
+SearchBarnstable_Base_URL = "https://search.barnstabledeeds.org/"
 
 
 @router.get("/properties")
@@ -34,7 +38,9 @@ def getProperties(
             property["owner"] = columns[2].text.strip()
             property["extra_1"] = columns[3].text.strip()
             property["extra_2"] = columns[4].text.strip()
-            property["details_link"] = Base_URL + columns[5].find("a")["href"].strip()
+            property["details_link"] = (
+                TownOfBarnStable_Base_URL + columns[5].find("a")["href"].strip()
+            )
             properties.append(property)
 
         if len(rows) <= 1:
@@ -122,21 +128,44 @@ def getProperty(url: Union[str, None] = None):
 @router.get("/deeds")
 def getDeeds(
     lastName: Union[str, None] = None,
+    deed_date: Union[str, None] = None,
 ):
-    response = requests.get(
-        f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName}&W9GNM=&W9IXTP=A&W9ABR=DD&W9TOWN=*ALL&W9INQ=AY&W9FDTA=&W9TDTA=&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
-    )
-    soup = BeautifulSoup(response.text, "html.parser")
-    registry_records_table = (
-        soup.find("form", {"id": "search"})
-        .find("div", {"class": "mainContent"})
-        .find("table", recursive=False)
-    )
-    if len(registry_records_table.find_all("tr")) < 2:
-        result = "There is no result"
-        response = requests.get(
-            f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SN8={lastName}&W9GN8=&W9IXTP=A&W9SN8B=&W9GN8B=&W9IXTPB=+&W9ABR=DD&W9TOWN=*ALL&W9FDTA=&W9TDTA=&WSHTNM=WW401L00&WSIQTP=LC01LP&WSWVER=2#schTerms"
-        )
+    def get_records_table(url):
+        response = requests.get(url)
+
         soup = BeautifulSoup(response.text, "html.parser")
+        records_table = (
+            soup.find("form", {"id": "search"})
+            .find("div", {"class": "mainContent"})
+            .find("table", recursive=False)
+        )
+
+        return records_table
+
+    def get_deeds_from_table(table, date):
+        results = []
+        for tr in table.find_all("tr")[1:]:
+            try:
+                date_recvd = tr.find_all("td")[3].text
+            except:
+                break
+            if datetime.strptime(date_recvd, "%m-%d-%Y").strftime("%Y-%m-%d") == date:
+                deed_url = tr.find_all("td")[8].find("a")["href"]
+                if deed_url not in results:
+                    results.append(SearchBarnstable_Base_URL + deed_url[1:])
+        return results
+
+    deeds_urls = []
+    registry_records_table = get_records_table(
+        f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName[:28]}&W9GNM=&W9IXTP=A&W9ABR=DD&W9TOWN=*ALL&W9INQ=AY&W9FDTA=&W9TDTA=&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
+    )
+    if len(registry_records_table.find_all("tr")) < 3:
+        land_court_records = get_records_table(
+            f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SN8={lastName[:28]}&W9GN8=&W9IXTP=A&W9SN8B=&W9GN8B=&W9IXTPB=+&W9ABR=DD&W9TOWN=*ALL&W9FDTA=&W9TDTA=&WSHTNM=WW401L00&WSIQTP=LC01LP&WSWVER=2#schTerms"
+        )
+        if len(registry_records_table.find_all("tr")) > 2:
+            deeds_urls = get_deeds_from_table(land_court_records, deed_date)
     else:
-        result = f"There are {len(registry_records_table.find_all('tr')) - 2} results"
+        deeds_urls = get_deeds_from_table(registry_records_table, deed_date)
+
+    return deeds_urls
