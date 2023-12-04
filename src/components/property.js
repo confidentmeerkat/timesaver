@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { sessionStorage as storage } from "js-storage";
 import Header from "./header";
+import DeedModal from "./modal";
 
 const Property = () => {
   const { search } = useLocation();
@@ -11,6 +12,12 @@ const Property = () => {
   const property_id = new URL(window.location.href).searchParams.get(
     "property_id"
   );
+
+  const [deedModalShow, setDeedModalShow] = useState(false);
+  const handleDeedModalOpen = () => {
+    setDeedModalShow(true);
+  };
+  const handleDeedModalClose = () => setDeedModalShow(false);
 
   const [loaded, setLoaded] = useState(!!storage.get(property_id));
   const [property, setProperty] = useState(
@@ -27,19 +34,6 @@ const Property = () => {
           setProperty(data);
         });
   }, [details_url]);
-
-  const handleGetDeeds = () => {
-    axios
-      .get("/api/deeds", {
-        params: {
-          lastName: property.owner,
-          deed_date: property.sales_history[0].sale_date,
-        },
-      })
-      .then(({ data }) => {
-        console.log(data);
-      });
-  };
 
   return (
     <>
@@ -66,7 +60,11 @@ const Property = () => {
                   </dt>
                   <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                     <span className="flex-grow">
-                      <a target="_blank" href={property.record_card_link}>
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={property.record_card_link}
+                      >
                         <img
                           src="https://www.townofbarnstable.us/Departments/Assessing/Property_Values/propcard.png"
                           alt="Report Card"
@@ -101,7 +99,7 @@ const Property = () => {
                       <button
                         type="button"
                         className="rounded-md bg-white font-medium text-gray-600 hover:text-gray-500"
-                        onClick={handleGetDeeds}
+                        onClick={handleDeedModalOpen}
                       >
                         Deeds
                       </button>
@@ -212,6 +210,14 @@ const Property = () => {
             </span>
           </div>
         </div>
+      )}
+      {deedModalShow && (
+        <DeedModal
+          open={deedModalShow}
+          onClose={handleDeedModalClose}
+          name={property.owner}
+          date={property.sales_history[0].sale_date}
+        />
       )}
     </>
   );

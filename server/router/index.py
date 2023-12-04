@@ -155,6 +155,20 @@ def getDeeds(
                     results.append(SearchBarnstable_Base_URL + deed_url[1:])
         return results
 
+    def ocr_space_file(filename, overlay=False, api_key="helloworld", language="eng"):
+        payload = {
+            "url": "https://search.barnstabledeeds.org/WwwImg/DGLG.PDF",
+            "isOverlayRequired": overlay,
+            "apikey": api_key,
+            "language": language,
+            "OCREngine": 1,
+        }
+        r = requests.post(
+            "https://api.ocr.space/parse/image",
+            data=payload,
+        )
+        return r.content.decode()
+
     deeds_urls = []
     registry_records_table = get_records_table(
         f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName[:28]}&W9GNM=&W9IXTP=A&W9ABR=DD&W9TOWN=*ALL&W9INQ=AY&W9FDTA=&W9TDTA=&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
@@ -167,5 +181,9 @@ def getDeeds(
             deeds_urls = get_deeds_from_table(land_court_records, deed_date)
     else:
         deeds_urls = get_deeds_from_table(registry_records_table, deed_date)
+
+    ocr_result = ocr_space_file(
+        filename="DVA2.PDF", overlay=False, api_key="K83055649588957"
+    )
 
     return deeds_urls
