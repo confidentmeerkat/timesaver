@@ -1,9 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from typing import Union
 import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime
+import secrets
+import os
+from server.router.ocr import main as ocr
+from server.router.chatgpt import main as chatgpt
+import difflib
 
 router = APIRouter(prefix="/api")
 
@@ -127,6 +132,7 @@ def getProperty(url: Union[str, None] = None):
 
 @router.get("/deeds")
 def getDeeds(
+    request: Request,
     lastName: Union[str, None] = None,
     deed_date: Union[str, None] = None,
 ):
@@ -155,19 +161,32 @@ def getDeeds(
                     results.append(SearchBarnstable_Base_URL + deed_url[1:])
         return results
 
-    def ocr_space_file(filename, overlay=False, api_key="helloworld", language="eng"):
-        payload = {
-            "url": "https://search.barnstabledeeds.org/WwwImg/DGLG.PDF",
-            "isOverlayRequired": overlay,
-            "apikey": api_key,
-            "language": language,
-            "OCREngine": 1,
-        }
-        r = requests.post(
-            "https://api.ocr.space/parse/image",
-            data=payload,
-        )
-        return r.content.decode()
+    def find_closest_word(target_word, text):
+        words = text.split()
+        closest_word = difflib.get_close_matches(target_word, words, n=1, cutoff=0.6)
+        return closest_word[0] if closest_word else None
+
+    def find_price_after_word(word, text):
+        if word:
+            pattern = re.compile(re.escape(word) + r"[^$]*(\$[\d,]+(\.\d+)?)")
+            match = pattern.search(text)
+            if match:
+                return match.group(1)
+        return None
+
+    def find_closest_phrase(target_phrase, text, max_phrase_length=10):
+        words = text.split()
+        best_ratio = 0.0
+        best_match = ""
+        for i in range(len(words)):
+            for j in range(i + 1, min(i + max_phrase_length, len(words) + 1)):
+                phrase = " ".join(words[i:j])
+                seq_matcher = difflib.SequenceMatcher(None, target_phrase, phrase)
+                ratio = seq_matcher.ratio()
+                if ratio > best_ratio:
+                    best_ratio = ratio
+                    best_match = phrase
+        return best_match
 
     deeds_urls = []
     registry_records_table = get_records_table(
@@ -182,8 +201,42 @@ def getDeeds(
     else:
         deeds_urls = get_deeds_from_table(registry_records_table, deed_date)
 
-    ocr_result = ocr_space_file(
-        filename="DVA2.PDF", overlay=False, api_key="K83055649588957"
-    )
+    ocred_result = {}
 
-    return deeds_urls
+    random_string = secrets.token_hex(16)
+    if not os.path.exists("temp"):
+        os.makedirs("temp", mode=0o777)
+
+    if len(deeds_urls) > 0:
+        response = requests.get(deeds_urls[0])
+        soup = BeautifulSoup(response.text, "html.parser")
+        pdf_url = soup.find("a", text="View the Image")["href"]
+        response = requests.get(SearchBarnstable_Base_URL + pdf_url)
+        with open(f"temp/{random_string}.pdf", "wb") as f:
+            f.write(response.content)
+        try:
+            first_page_text, whole_text = ocr(
+                os.path.abspath(f"temp/{random_string}.pdf")
+            )
+            seller, buyer, sale_price = chatgpt(first_page_text)
+            ocred_result["seller"] = seller
+            ocred_result["buyer"] = buyer
+            ocred_result["sale_price"] = sale_price
+
+            # ocred_result["sale_price"] = find_price_after_word(
+            #     find_closest_word("consideration", whole_text), whole_text
+            # )
+
+            closest_phrase = find_closest_phrase("quit claim covents", whole_text)
+            ocred_result["land_description"] = whole_text[
+                whole_text.find(closest_phrase) + len(closest_phrase) :
+            ]
+            ocred_result["deeds_count" : len(deeds_urls)]
+        except:
+            pass
+        finally:
+            os.remove(f"temp/{random_string}.pdf")
+    else:
+        ocred_result["deeds_count"] = 0
+
+    return ocred_result
