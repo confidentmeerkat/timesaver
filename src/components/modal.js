@@ -63,16 +63,6 @@ const DeedModal = ({ open, onClose, name, date }) => {
                           <dl className="divide-y divide-gray-100">
                             <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                               <dt className="text-sm font-medium leading-6 text-gray-900">
-                                Sale Price
-                              </dt>
-                              <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                <span className="flex-grow">
-                                  {data.sale_price}
-                                </span>
-                              </dd>
-                            </div>
-                            <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                              <dt className="text-sm font-medium leading-6 text-gray-900">
                                 Seller
                               </dt>
                               <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
@@ -85,6 +75,26 @@ const DeedModal = ({ open, onClose, name, date }) => {
                               </dt>
                               <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                                 <span className="flex-grow">{data.buyer}</span>
+                              </dd>
+                            </div>
+                            <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                              <dt className="text-sm font-medium leading-6 text-gray-900">
+                                Sale Price
+                              </dt>
+                              <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                <span className="flex-grow">
+                                  {data.sale_price}
+                                </span>
+                              </dd>
+                            </div>
+                            <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                              <dt className="text-sm font-medium leading-6 text-gray-900">
+                                Date of Deed
+                              </dt>
+                              <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                <span className="flex-grow">
+                                  {date}
+                                </span>
                               </dd>
                             </div>
                             <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
