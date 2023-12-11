@@ -98,7 +98,7 @@ const Property = () => {
                     <span className="ml-4 flex-shrink-0">
                       <button
                         type="button"
-                        className="rounded-md bg-white font-medium text-gray-600 hover:text-gray-500"
+                        className="block rounded-md bg-gray-900 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                         onClick={handleDeedModalOpen}
                       >
                         Deeds
