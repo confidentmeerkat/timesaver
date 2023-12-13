@@ -238,7 +238,8 @@ def getDeeds(
             # ocred_result["land_description"] = ocred_text["whole"][
             #     ocred_text["whole"].find(closest_phrase) + len(closest_phrase) :
             # ]
-            ocred_result["deeds_count" : len(deeds_urls)]
+            ocred_result["deeds_count"] = len(deeds_urls)
+            ocred_result["deed_url"] = SearchBarnstable_Base_URL + pdf_url
         except:
             pass
         finally:

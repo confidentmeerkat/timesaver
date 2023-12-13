@@ -4,7 +4,7 @@ import axios from "axios";
 
 const DeedModal = ({ open, onClose, name, date }) => {
   const [loaded, setLoaded] = useState(false);
-  const [data, setData] = useState("");
+  const [data, setData] = useState({});
 
   useEffect(() => {
     axios
@@ -49,7 +49,9 @@ const DeedModal = ({ open, onClose, name, date }) => {
               <Dialog.Panel className="relative min-w-[400px] min-h-[200px] transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl sm:p-6">
                 {loaded ? (
                   data.deeds_count === 0 ? (
-                    <p className="text-2xl">There are no deeds in this owner's name.</p>
+                    <p className="text-2xl">
+                      There are no deeds in this owner's name.
+                    </p>
                   ) : (
                     <>
                       <div>
@@ -58,9 +60,27 @@ const DeedModal = ({ open, onClose, name, date }) => {
                             as="h3"
                             className="text-base font-semibold leading-6 text-gray-900"
                           >
-                            Deeds
+                            Deed
                           </Dialog.Title>
                           <dl className="divide-y divide-gray-100">
+                            <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                              <dt className="text-sm font-medium leading-6 text-gray-900">
+                                PDF
+                              </dt>
+                              <dd className="mt-1 flex justify-center text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                <a
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  href={data.deed_url}
+                                >
+                                  <img
+                                    width={50}
+                                    height={50}
+                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQT6e_7m1x2QVNQ3IoIdmzv0mcoCKhRUyhG4182nUNLYRhPgW5MufGgl_zffZ3Aw5b5-Sc&s"
+                                  ></img>
+                                </a>
+                              </dd>
+                            </div>
                             <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                               <dt className="text-sm font-medium leading-6 text-gray-900">
                                 Seller
@@ -92,9 +112,7 @@ const DeedModal = ({ open, onClose, name, date }) => {
                                 Date of Deed
                               </dt>
                               <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                <span className="flex-grow">
-                                  {date}
-                                </span>
+                                <span className="flex-grow">{date}</span>
                               </dd>
                             </div>
                             <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
