@@ -10,6 +10,8 @@ from server.router.ocr import main as ocr
 from server.router.chatgpt import main as chatgpt
 import difflib
 
+# from docx import Document
+
 router = APIRouter(prefix="/api")
 
 TownOfBarnStable_Base_URL = (
@@ -133,7 +135,7 @@ def getProperty(url: Union[str, None] = None):
 @router.get("/deeds")
 def getDeeds(
     request: Request,
-    lastName: Union[str, None] = None,
+    ownername: Union[str, None] = None,
     deed_date: Union[str, None] = None,
 ):
     def get_records_table(url):
@@ -188,13 +190,21 @@ def getDeeds(
                     best_match = phrase
         return best_match
 
+    if ", " in ownername:
+        lastName = ownername.split(", ")[0]
+        firstName = ownername.split(", ")[1].split(" ")[0]
+    else:
+        lastName = ownername[:28]
+        firstName = ""
+
     deeds_urls = []
     registry_records_table = get_records_table(
-        f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName[:28]}&W9GNM=&W9IXTP=A&W9ABR=DD&W9TOWN=*ALL&W9INQ=AY&W9FDTA=&W9TDTA=&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
+        f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName}&W9GNM={firstName}&W9IXTP=A&W9ABR=DD&W9TOWN=*ALL&W9INQ=AY&W9FDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9TDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
     )
+
     if len(registry_records_table.find_all("tr")) < 3:
         land_court_records = get_records_table(
-            f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SN8={lastName[:28]}&W9GN8=&W9IXTP=A&W9SN8B=&W9GN8B=&W9IXTPB=+&W9ABR=DD&W9TOWN=*ALL&W9FDTA=&W9TDTA=&WSHTNM=WW401L00&WSIQTP=LC01LP&WSWVER=2#schTerms"
+            f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?WSIQTP=LC01L&WSKYCD=L&W9ABR=DD&W9FDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9GN8={firstName}&W9GN8B=&W9INQ=&W9IXTP=A&W9IXTPB=&W9MBGP=LC&W9SN8={lastName}&W9SN8B=&W9TDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9TOWN=*ALL&WSSRPP=30#schTerms"
         )
         if len(registry_records_table.find_all("tr")) > 2:
             deeds_urls = get_deeds_from_table(land_court_records, deed_date)
@@ -215,22 +225,19 @@ def getDeeds(
         with open(f"temp/{random_string}.pdf", "wb") as f:
             f.write(response.content)
         try:
-            first_page_text, whole_text = ocr(
-                os.path.abspath(f"temp/{random_string}.pdf")
-            )
-            seller, buyer, sale_price = chatgpt(first_page_text)
+            ocred_text = ocr(os.path.abspath(f"temp/{random_string}.pdf"))
+            seller, buyer, sale_price, land_description = chatgpt(ocred_text)
             ocred_result["seller"] = seller
             ocred_result["buyer"] = buyer
             ocred_result["sale_price"] = sale_price
+            ocred_result["land_description"] = land_description
 
-            # ocred_result["sale_price"] = find_price_after_word(
-            #     find_closest_word("consideration", whole_text), whole_text
+            # closest_phrase = find_closest_phrase(
+            #     "quit claim covents", ocred_text["whole"]
             # )
-
-            closest_phrase = find_closest_phrase("quit claim covents", whole_text)
-            ocred_result["land_description"] = whole_text[
-                whole_text.find(closest_phrase) + len(closest_phrase) :
-            ]
+            # ocred_result["land_description"] = ocred_text["whole"][
+            #     ocred_text["whole"].find(closest_phrase) + len(closest_phrase) :
+            # ]
             ocred_result["deeds_count" : len(deeds_urls)]
         except:
             pass
@@ -240,3 +247,14 @@ def getDeeds(
         ocred_result["deeds_count"] = 0
 
     return ocred_result
+
+
+@router.post("/report")
+def report():
+    # document = Document()
+
+    # document.add_paragraph("This is a sample Word document.")
+
+    # document.save("output.docx")
+
+    return "Hello"

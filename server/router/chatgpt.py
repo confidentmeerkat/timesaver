@@ -12,7 +12,7 @@ def main(text):
                 "role": "user",
                 "content": text
                 + "\n"
-                + "Print the seller, buyer and sale price of this property from above text as json(keys are: 'seller, buyer and 'sale_price'')",
+                + "Print the seller, buyer, sale price and land description of this property from above text as json(keys are: seller, buyer, sale_price and land_description)",
             }
         ],
         model="gpt-3.5-turbo",

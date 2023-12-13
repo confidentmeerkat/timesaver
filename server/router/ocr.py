@@ -2,8 +2,8 @@ import pytesseract
 from pdf2image import convert_from_path
 from os import path
 
-# pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+# pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
 def pdf2img(filename):
@@ -11,20 +11,12 @@ def pdf2img(filename):
 
 
 def parse_pdf_file(filename):
-    try:
-        page_txt = []
-        images = pdf2img(filename)
-        for index, img in enumerate(images):
-            if index == 0:
-                first_page_text = ocr(img)
-                page_txt.append(first_page_text)
-            else:
-                page_txt.append(ocr(img))
-        whole_text = "\n\n".join(page_txt)
-        return first_page_text, whole_text
-    except Exception as e:
-        print(str(e))
-        return None
+    while True:
+        try:
+            images = pdf2img(filename)
+            return ocr(images[0])
+        except Exception as e:
+            print(str(e))
 
 
 def ocr(img):

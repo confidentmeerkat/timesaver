@@ -10,7 +10,7 @@ const DeedModal = ({ open, onClose, name, date }) => {
     axios
       .get("/api/deeds", {
         params: {
-          lastName: name,
+          ownername: name,
           deed_date: date,
         },
       })
@@ -49,7 +49,7 @@ const DeedModal = ({ open, onClose, name, date }) => {
               <Dialog.Panel className="relative min-w-[400px] min-h-[200px] transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl sm:p-6">
                 {loaded ? (
                   data.deeds_count === 0 ? (
-                    <p className="text-2xl">There is no deeds with this owner name.</p>
+                    <p className="text-2xl">There are no deeds in this owner's name.</p>
                   ) : (
                     <>
                       <div>
