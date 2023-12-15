@@ -1,10 +1,14 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
+import { sessionStorage as storage } from "js-storage";
 
 const DeedModal = ({ open, onClose, name, date }) => {
-  const [loaded, setLoaded] = useState(false);
-  const [data, setData] = useState({});
+  const property_id = new URL(window.location.href).searchParams.get(
+    "property_id"
+  );
+  const [loaded, setLoaded] = useState(!!storage.get(property_id).deed);
+  const [data, setData] = useState(storage.get(property_id).deed);
 
   useEffect(() => {
     axios
@@ -17,6 +21,9 @@ const DeedModal = ({ open, onClose, name, date }) => {
       .then(({ data }) => {
         setLoaded(true);
         setData(data);
+        storage.set({
+          [property_id]: { ...storage.get(property_id), deed: data },
+        });
       });
   }, [name, date]);
 
@@ -74,11 +81,20 @@ const DeedModal = ({ open, onClose, name, date }) => {
                                   href={data.deed_url}
                                 >
                                   <img
+                                    alt="deed_pdf"
                                     width={50}
                                     height={50}
                                     src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQT6e_7m1x2QVNQ3IoIdmzv0mcoCKhRUyhG4182nUNLYRhPgW5MufGgl_zffZ3Aw5b5-Sc&s"
                                   ></img>
                                 </a>
+                              </dd>
+                            </div>
+                            <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                              <dt className="text-sm font-medium leading-6 text-gray-900">
+                                Book-Page
+                              </dt>
+                              <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                <span className="flex-grow">{data.deed_page}</span>
                               </dd>
                             </div>
                             <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

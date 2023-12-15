@@ -12,7 +12,7 @@ def main(text):
                 "role": "user",
                 "content": text
                 + "\n"
-                + "Print the seller, buyer, sale price and land description of this property from above text as json(keys are: seller, buyer, sale_price and land_description)",
+                + 'Print the seller, buyer, sale price and land description of this property from above text as json(keys are: seller, buyer, sale_price and land_description). so the result format is "key": "value"',
             }
         ],
         model="gpt-3.5-turbo",
@@ -24,11 +24,14 @@ def main(text):
         .replace("}", "")
         .replace("'", "")
     )
-    pairs = response.split('",')
+    pairs = response.split('",\n')
 
     template_dict = {}
     for pair in pairs:
-        key, value = pair.split(":")
-        template_dict[key.strip()] = value.strip().replace('"', "")
+        try:
+            key, value = pair.split('": ')
+            template_dict[key.strip()] = value.strip().replace('"', "")
+        except Exception as e:
+            print(e)
 
     return template_dict.values()
