@@ -3,28 +3,34 @@ import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
 import { sessionStorage as storage } from "js-storage";
 
-const DeedModal = ({ open, onClose, name, date }) => {
+const DeedModal = ({ open, onClose, name, date, page, book }) => {
   const property_id = new URL(window.location.href).searchParams.get(
     "property_id"
   );
-  const [loaded, setLoaded] = useState(!!storage.get(property_id).deed);
-  const [data, setData] = useState(storage.get(property_id).deed);
+  const [loaded, setLoaded] = useState(
+    page ? false : !!storage.get(property_id).deed
+  );
+  const [data, setData] = useState(page ? {} : storage.get(property_id).deed);
 
   useEffect(() => {
-    axios
-      .get("/api/deeds", {
-        params: {
-          ownername: name,
-          deed_date: date,
-        },
-      })
-      .then(({ data }) => {
-        setLoaded(true);
-        setData(data);
-        storage.set({
-          [property_id]: { ...storage.get(property_id), deed: data },
+    if (!loaded)
+      axios
+        .get("/api/deeds", {
+          params: {
+            ownername: name,
+            deed_date: date,
+            page,
+            book,
+          },
+        })
+        .then(({ data }) => {
+          setLoaded(true);
+          setData(data);
+          if (!page)
+            storage.set({
+              [property_id]: { ...storage.get(property_id), deed: data },
+            });
         });
-      });
   }, [name, date]);
 
   return (
@@ -94,7 +100,9 @@ const DeedModal = ({ open, onClose, name, date }) => {
                                 Book-Page
                               </dt>
                               <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                <span className="flex-grow">{data.deed_page}</span>
+                                <span className="flex-grow">
+                                  {page ? book + "-" + page : data.deed_page}
+                                </span>
                               </dd>
                             </div>
                             <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -128,7 +136,9 @@ const DeedModal = ({ open, onClose, name, date }) => {
                                 Date of Deed
                               </dt>
                               <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                <span className="flex-grow">{date}</span>
+                                <span className="flex-grow">
+                                  {page ? data.deed_date : date}
+                                </span>
                               </dd>
                             </div>
                             <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -138,6 +148,16 @@ const DeedModal = ({ open, onClose, name, date }) => {
                               <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                                 <span className="flex-grow">
                                   {data.land_description}
+                                </span>
+                              </dd>
+                            </div>
+                            <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                              <dt className="text-sm font-medium leading-6 text-gray-900">
+                                Other Covenants
+                              </dt>
+                              <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                <span className="flex-grow">
+                                  {data.other_covenants}
                                 </span>
                               </dd>
                             </div>

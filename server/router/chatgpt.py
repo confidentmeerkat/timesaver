@@ -12,7 +12,7 @@ def main(text):
                 "role": "user",
                 "content": text
                 + "\n"
-                + 'Print the seller, buyer, sale price and land description of this property from above text as json(keys are: seller, buyer, sale_price and land_description). so the result format is "key": "value"',
+                + 'Print the seller, buyer, sale price, land description and other covenants of this property from above text as json(keys are: seller, buyer, sale_price, land_description, other_covenants). so the result format is "key": "value". land description should contain all info as well as other covenants',
             }
         ],
         model="gpt-3.5-turbo",

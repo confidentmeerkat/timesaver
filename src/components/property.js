@@ -3,7 +3,10 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { sessionStorage as storage } from "js-storage";
 import Header from "./header";
-import DeedModal from "./modal";
+import DeedModal from "./deedModal";
+import { saveAs } from "file-saver";
+import { propertyTemplate } from "./html_templates/property_template";
+import BookPageModal from "./BookPageModal";
 
 const Property = () => {
   const { search } = useLocation();
@@ -14,10 +17,24 @@ const Property = () => {
   );
 
   const [deedModalShow, setDeedModalShow] = useState(false);
+  const [{ book, page }, setDeedModalProps] = useState({});
+  const handleSetDeedModalProps = (book, page) => {
+    setDeedModalShow(true);
+    setDeedModalProps({ book, page });
+  };
   const handleDeedModalOpen = () => {
     setDeedModalShow(true);
   };
-  const handleDeedModalClose = () => setDeedModalShow(false);
+  const handleDeedModalClose = () => {
+    setDeedModalShow(false);
+    setDeedModalProps({})
+  };
+
+  const [bookPageModalShow, setBookPageModalShow] = useState(false);
+  const handleBookPageModalOpen = () => {
+    setBookPageModalShow(true);
+  };
+  const handleBookPageModalClose = () => setBookPageModalShow(false);
 
   const [loaded, setLoaded] = useState(!!storage.get(property_id));
   const [property, setProperty] = useState(
@@ -35,6 +52,29 @@ const Property = () => {
         });
   }, [details_url]);
 
+  const handleReport = () => {
+    if (!!storage.get(property_id).deed) {
+      // const property_urls = [
+      //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKBt3cOuKwJa7__rvWkIdyOcgEJGj4elmJQA&usqp=CAU",
+      //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIw-6y2Hi0q6J2qFo0IEaqhLZp5KHtZgaYzw&usqp=CAU",
+      //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoO451Ny6lJjmZ8F8Q4ew6V227uDJ3JXhyqw&usqp=CAU",
+      //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr9-O7wd15WsxmOxC5mRbJ3XAqei0dVzuGxw&usqp=CAU",
+      //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVwoRiEY_PqV_cZOUFWub-r2WoKqTfU_SrWQ&usqp=CAU",
+      //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkwi4PzHlfkjL07lnR0J8HKNL34vOIG0nxKA&usqp=CAU",
+      // ];
+
+      const title = "Hello World";
+      const name = "John Doe";
+      const age = 34;
+
+      const htmlContent = propertyTemplate({ title, name, age });
+
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const fileName = "property.html";
+      saveAs(blob, fileName);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -48,6 +88,7 @@ const Property = () => {
               <button
                 type="submit"
                 className="block rounded-md bg-gray-900 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                onClick={handleReport}
               >
                 Report
               </button>
@@ -101,7 +142,16 @@ const Property = () => {
                         className="block rounded-md bg-gray-900 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                         onClick={handleDeedModalOpen}
                       >
-                        Deeds
+                        Deed
+                      </button>
+                    </span>
+                    <span className="ml-4 flex-shrink-0">
+                      <button
+                        type="button"
+                        className="block rounded-md bg-gray-900 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                        onClick={handleBookPageModalOpen}
+                      >
+                        Deed by Book/Page
                       </button>
                     </span>
                   </dd>
@@ -217,6 +267,15 @@ const Property = () => {
           onClose={handleDeedModalClose}
           name={property.owner}
           date={property.sales_history[0].sale_date}
+          book={book}
+          page={page}
+        />
+      )}
+      {bookPageModalShow && (
+        <BookPageModal
+          open={bookPageModalShow}
+          onClose={handleBookPageModalClose}
+          onConfirm={handleSetDeedModalProps}
         />
       )}
     </>

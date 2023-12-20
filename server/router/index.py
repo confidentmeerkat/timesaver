@@ -137,6 +137,8 @@ def getDeeds(
     request: Request,
     ownername: Union[str, None] = None,
     deed_date: Union[str, None] = None,
+    book: Union[str, None] = None,
+    page: Union[str, None] = None,
 ):
     def get_records_table(url):
         response = requests.get(url)
@@ -159,59 +161,76 @@ def getDeeds(
                 break
             if datetime.strptime(date_recvd, "%m-%d-%Y").strftime("%Y-%m-%d") == date:
                 deed_url = tr.find_all("td")[8].find("a")["href"]
+                deed_page = tr.find_all("td")[6].text
                 if deed_url not in results:
                     results.append(SearchBarnstable_Base_URL + deed_url[1:])
-        return results
-
-    def find_closest_word(target_word, text):
-        words = text.split()
-        closest_word = difflib.get_close_matches(target_word, words, n=1, cutoff=0.6)
-        return closest_word[0] if closest_word else None
-
-    def find_price_after_word(word, text):
-        if word:
-            pattern = re.compile(re.escape(word) + r"[^$]*(\$[\d,]+(\.\d+)?)")
-            match = pattern.search(text)
-            if match:
-                return match.group(1)
-        return None
-
-    def find_closest_phrase(target_phrase, text, max_phrase_length=10):
-        words = text.split()
-        best_ratio = 0.0
-        best_match = ""
-        for i in range(len(words)):
-            for j in range(i + 1, min(i + max_phrase_length, len(words) + 1)):
-                phrase = " ".join(words[i:j])
-                seq_matcher = difflib.SequenceMatcher(None, target_phrase, phrase)
-                ratio = seq_matcher.ratio()
-                if ratio > best_ratio:
-                    best_ratio = ratio
-                    best_match = phrase
-        return best_match
-
-    if ", " in ownername:
-        lastName = ownername.split(", ")[0]
-        firstName = ownername.split(", ")[1].split(" ")[0]
-    else:
-        lastName = ownername[:28]
-        firstName = ""
+        return deed_page, results
 
     deeds_urls = []
-    registry_records_table = get_records_table(
-        f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName}&W9GNM={firstName}&W9IXTP=A&W9ABR=DD&W9TOWN=*ALL&W9INQ=AY&W9FDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9TDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
-    )
-
-    if len(registry_records_table.find_all("tr")) < 3:
-        land_court_records = get_records_table(
-            f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?WSIQTP=LC01L&WSKYCD=L&W9ABR=DD&W9FDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9GN8={firstName}&W9GN8B=&W9INQ=&W9IXTP=A&W9IXTPB=&W9MBGP=LC&W9SN8={lastName}&W9SN8B=&W9TDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9TOWN=*ALL&WSSRPP=30#schTerms"
-        )
-        if len(registry_records_table.find_all("tr")) > 2:
-            deeds_urls = get_deeds_from_table(land_court_records, deed_date)
-    else:
-        deeds_urls = get_deeds_from_table(registry_records_table, deed_date)
-
+    deed_page = ""
     ocred_result = {}
+
+    if page is None:
+        if ", " in ownername:
+            lastName = ownername.split(", ")[0]
+            firstName = ownername.split(", ")[1].split(" ")[0]
+        else:
+            words = ownername.split(" ")
+            if words[len(words) - 1] == "LP":
+                words.pop()
+                lastName = " ".join(words)
+            else:
+                lastName = ownername[:28]
+            firstName = ""
+
+        registry_records_table = get_records_table(
+            f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9SNM={lastName}&W9GNM={firstName}&W9IXTP=A&W9ABR=DD&W9TOWN=*ALL&W9INQ=AY&W9FDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9TDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&AYVAL=+1742&CYVAL=2015&WSHTNM=WW401R00&WSIQTP=LR01LP&WSKYCD=N&WSWVER=2&W9INQ=#schTerms"
+        )
+
+        if len(registry_records_table.find_all("tr")) < 3:
+            land_court_records = get_records_table(
+                f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?WSIQTP=LC01L&WSKYCD=L&W9ABR=DD&W9FDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9GN8={firstName}&W9GN8B=&W9INQ=&W9IXTP=A&W9IXTPB=&W9MBGP=LC&W9SN8={lastName}&W9SN8B=&W9TDTA={datetime.strptime(deed_date, '%Y-%m-%d').strftime('%m%d%Y')}&W9TOWN=*ALL&WSSRPP=30#schTerms"
+            )
+            if len(registry_records_table.find_all("tr")) > 2:
+                deed_page, deeds_urls = get_deeds_from_table(
+                    land_court_records, deed_date
+                )
+        else:
+            deed_page, deeds_urls = get_deeds_from_table(
+                registry_records_table, deed_date
+            )
+    else:
+        response = requests.get(
+            f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9BK={book}&W9PG={page}&WSHTNM=WW409R00&WSIQTP=LR09AP&WSKYCD=B&WSWVER=2#schTerms"
+        )
+        soup = BeautifulSoup(response.text, "html.parser")
+        if (
+            len(
+                soup.find("form", {"id": "search"})
+                .find("div", {"class": "mainContent"})
+                .find("table", recursive=False)
+                .find_all("tr")
+            )
+            > 2
+        ):
+            deeds_urls.append(
+                SearchBarnstable_Base_URL
+                + soup.find("form", {"id": "search"})
+                .find("div", {"class": "mainContent"})
+                .find("table", recursive=False)
+                .find_all("tr")[1]
+                .find_all("td")[0]
+                .find("a")["href"]
+            )
+            ocred_result["deed_date"] = re.search(
+                r"\d{2}-\d{2}-\d{4}",
+                soup.find("form", {"id": "search"})
+                .find("div", {"class": "mainContent"})
+                .find("table", recursive=False)
+                .find_all("tr")[1]
+                .find_all("td")[0]
+                .text,
+            ).group()
 
     random_string = secrets.token_hex(16)
     if not os.path.exists("temp"):
@@ -226,18 +245,14 @@ def getDeeds(
             f.write(response.content)
         try:
             ocred_text = ocr(os.path.abspath(f"temp/{random_string}.pdf"))
-            seller, buyer, sale_price, land_description = chatgpt(ocred_text)
+            seller, buyer, sale_price, land_description, other_covenants = chatgpt(
+                ocred_text
+            )
             ocred_result["seller"] = seller
             ocred_result["buyer"] = buyer
             ocred_result["sale_price"] = sale_price
             ocred_result["land_description"] = land_description
-
-            # closest_phrase = find_closest_phrase(
-            #     "quit claim covents", ocred_text["whole"]
-            # )
-            # ocred_result["land_description"] = ocred_text["whole"][
-            #     ocred_text["whole"].find(closest_phrase) + len(closest_phrase) :
-            # ]
+            ocred_result["other_covenants"] = other_covenants
             ocred_result["deeds_count"] = len(deeds_urls)
             ocred_result["deed_url"] = SearchBarnstable_Base_URL + pdf_url
         except:
