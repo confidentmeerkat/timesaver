@@ -26,7 +26,7 @@ def getProperties(
     state: Union[str, None] = None,
     db: Session = Depends(get_db),
 ):
-    create_createria(db, street, streetNum, city, state)
+    # create_createria(db, street, streetNum, city, state)
     properties = []
     page = 0
 
@@ -59,6 +59,14 @@ def getProperties(
 
 @router.get("/property")
 def getProperty(url: Union[str, None] = None):
+    def get_map(map_url):
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, "html.parser")
+        map_link = soup.find("img", src=lambda src: src and "propertyimages" in src)
+        if map_link:
+            return map_link["src"]
+        return None
+
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
     property = {}
@@ -67,7 +75,9 @@ def getProperty(url: Union[str, None] = None):
     record_card_link = soup.find(
         "a", href=lambda href: href and "PropertyRecordCards" in href
     )["href"].strip()
+    gis_link = soup.find("a", text="GIS MAPS")["href"]
     property["record_card_link"] = record_card_link
+    property["map_link"] = get_map(gis_link)
 
     # onwer information
     owner_info = soup.find("div", {"id": "accordion"}).find_all("div")[0].text
