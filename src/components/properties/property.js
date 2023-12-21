@@ -54,13 +54,13 @@ const Property = () => {
 
   const handleReport = () => {
     if (!!storage.get(property_id).deed) {
-      const name = "John Doe";
-      const age = 34;
-
       const htmlContent = propertyTemplate({
         image: property.map_link,
         property_info: property,
-        deed_info: storage.get(property_id).deed,
+        deed_info: {
+          ...storage.get(property_id).deed,
+          deed_date: property.sales_history[0].sale_date,
+        },
       });
 
       const blob = new Blob([htmlContent], { type: "text/html" });
