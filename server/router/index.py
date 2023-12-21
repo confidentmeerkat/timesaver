@@ -26,9 +26,7 @@ def getProperties(
     state: Union[str, None] = None,
     db: Session = Depends(get_db),
 ):
-    create_createria(
-        db, {"street": street, "street_number": streetNum, "city": city, "state": state}
-    )
+    create_createria(db, street, streetNum, city, state)
     properties = []
     page = 0
 
