@@ -27,7 +27,7 @@ const Property = () => {
   };
   const handleDeedModalClose = () => {
     setDeedModalShow(false);
-    setDeedModalProps({})
+    setDeedModalProps({});
   };
 
   const [bookPageModalShow, setBookPageModalShow] = useState(false);
@@ -63,14 +63,17 @@ const Property = () => {
       //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkwi4PzHlfkjL07lnR0J8HKNL34vOIG0nxKA&usqp=CAU",
       // ];
 
-      const title = "Hello World";
       const name = "John Doe";
       const age = 34;
 
-      const htmlContent = propertyTemplate({ title, name, age });
+      const htmlContent = propertyTemplate({
+        title: property.address,
+        name,
+        age,
+      });
 
       const blob = new Blob([htmlContent], { type: "text/html" });
-      const fileName = "property.html";
+      const fileName = property.address;
       saveAs(blob, fileName);
     }
   };

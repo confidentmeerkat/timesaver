@@ -5,6 +5,8 @@ import Property from "./components/property";
 import { createContext, useState } from "react";
 import { sessionStorage as storage } from "js-storage";
 import BlankPage from "./components/404";
+import Login from "./components/auth/login";
+import Register from "./components/auth/register";
 
 export const PropertyContext = createContext([]);
 export const BuyerInfoContext = createContext();
@@ -26,6 +28,8 @@ function App() {
           <Routes>
             <Route exact path="/property" element={<Property />} />
             <Route exact path="/properties" element={<Properties />} />
+            <Route exact path="/login" element={<Login />} />
+            <Route exact path="/signup" element={<Register />} />
             <Route exact path="/" element={<Home />} />
             <Route path="/:id?" element={<BlankPage />} />
           </Routes>

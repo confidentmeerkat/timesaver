@@ -1,16 +1,14 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from typing import Union
-import requests
 from bs4 import BeautifulSoup
-import re
 from datetime import datetime
 import secrets
-import os
 from server.router.ocr import main as ocr
 from server.router.chatgpt import main as chatgpt
-import difflib
-
-# from docx import Document
+from server.db.database import get_db
+from sqlalchemy.orm import Session
+from server.db.models.Creteria import create as create_createria
+import re, os, difflib, requests
 
 router = APIRouter(prefix="/api")
 
@@ -26,7 +24,11 @@ def getProperties(
     streetNum: Union[str, None] = None,
     city: Union[str, None] = None,
     state: Union[str, None] = None,
+    db: Session = Depends(get_db),
 ):
+    create_createria(
+        db, {"street": street, "street_number": streetNum, "city": city, "state": state}
+    )
     properties = []
     page = 0
 
