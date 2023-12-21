@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { BuyerInfoContext, PropertyContext } from "../App";
+import { BuyerInfoContext, PropertyContext } from "../../App";
 import { useNavigate } from "react-router-dom";
-import Header from "./header";
+import Header from "../common/header";
 import { sessionStorage as storage } from "js-storage";
 
 const Properties = () => {

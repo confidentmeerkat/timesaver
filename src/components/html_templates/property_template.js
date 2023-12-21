@@ -1,4 +1,8 @@
-export const propertyTemplate = ({ image }) => {
+export const propertyTemplate = ({
+  image,
+  property_info: property,
+  deed_info: deed,
+}) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -60,16 +64,16 @@ export const propertyTemplate = ({ image }) => {
             .border-2 {
             border-width: 2px;
             }
-            .border-b-\[1px\] {
+            .border-b-\\[1px\\] {
             border-bottom-width: 1px;
             }
-            .border-b-\[2px\] {
+            .border-b-\\[2px\\] {
             border-bottom-width: 2px;
             }
             .border-solid {
             border-style: solid;
             }
-            .border-\[\#E0E0E0\] {
+            .border-\\[\\#E0E0E0\\] {
             --tw-border-opacity: 1;
             border-color: rgb(224 224 224 / var(--tw-border-opacity));
             }
@@ -81,7 +85,7 @@ export const propertyTemplate = ({ image }) => {
             --tw-border-opacity: 1;
             border-bottom-color: rgb(156 163 175 / var(--tw-border-opacity));
             }
-            .bg-\[\#F8F8F8\] {
+            .bg-\\[\\#F8F8F8\\] {
             --tw-bg-opacity: 1;
             background-color: rgb(248 248 248 / var(--tw-bg-opacity));
             }
@@ -112,7 +116,7 @@ export const propertyTemplate = ({ image }) => {
             .pb-3 {
             padding-bottom: 0.75rem;
             }
-            .pb-\[2px\] {
+            .pb-\\[2px\\] {
             padding-bottom: 2px;
             }
             .pl-2 {
@@ -136,7 +140,7 @@ export const propertyTemplate = ({ image }) => {
             font-size: 1.25rem;
             line-height: 1.75rem;
             }
-            .font-\[500\] {
+            .font-\\[500\\] {
             font-weight: 500;
             }
             .font-bold {
@@ -183,27 +187,40 @@ export const propertyTemplate = ({ image }) => {
                     class="border-solid border-2 border-gray-250 border-[#E0E0E0] bg-white p-3 shadow-md border-b-gray-400"
                 >
                     <div class="grid grid-cols-8 pb-3 gap-5">
-                    <p class="col-span-3 font-[500] pb-[2px]">Address</p>
-                    <p class="col-span-5 pb-[2px]">
-                        391 South Street, Village; Hyannis
-                    </p>
+                        <p class="col-span-3 font-[500] pb-[2px]">Report Card</p>
+                        <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href=${property.record_card_link}
+                        >
+                            <img
+                            src="https://www.townofbarnstable.us/Departments/Assessing/Property_Values/propcard.png"
+                            alt="Report Card"
+                            />
+                      </a>
+                    </div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">Address</p>
+                        <p class="col-span-5 pb-[2px]">
+                            ${property.address}
+                        </p>
                     </div>
     
                     <div class="grid grid-cols-8 pb-3 gap-5">
-                    <p class="col-span-3 font-[500] pb-[2px]">Parcel</p>
-                    <p class="col-span-5 pb-[2px]">308 / 219/</p>
+                        <p class="col-span-3 font-[500] pb-[2px]">Parcel</p>
+                        <p class="col-span-5 pb-[2px]">${property.parcel}</p>
                     </div>
     
                     <div class="grid grid-cols-8 pb-3 gap-5">
-                    <p class="col-span-3 font-[500] pb-[2px]">Owner Name</p>
-                    <p class="col-span-5 pb-[2px]">ANK Reality LLC</p>
+                        <p class="col-span-3 font-[500] pb-[2px]">Owner Name</p>
+                        <p class="col-span-5 pb-[2px]">${property.owner}</p>
                     </div>
     
                     <div class="grid grid-cols-8 pb-3 gap-5">
-                    <p class="col-span-3 font-[500] pb-[2px]">Owner Address</p>
-                    <p class="col-span-5 pb-[2px]">
-                        775 Main Street Hyannis Ma 02601
-                    </p>
+                        <p class="col-span-3 font-[500] pb-[2px]">Owner Address</p>
+                        <p class="col-span-5 pb-[2px]">
+                            ${property.owner_address}
+                        </p>
                     </div>
                 </div>
                 </div>
@@ -215,7 +232,9 @@ export const propertyTemplate = ({ image }) => {
                 <div
                     class="border-solid border-2 border-gray-250 border-[#E0E0E0] bg-white p-3 shadow-md border-b-gray-400"
                 >
-                    <p class="col-span-3 font-[500] pb-[2px]">$ 573, 700</p>
+                    <p class="col-span-3 font-[500] pb-[2px]">${
+                      property.assessed_value
+                    }</p>
                 </div>
                 </div>
     
@@ -226,7 +245,9 @@ export const propertyTemplate = ({ image }) => {
                 <div
                     class="border-solid border-2 border-gray-250 border-[#E0E0E0] bg-white p-3 shadow-md border-b-gray-400"
                 >
-                    <p class="col-span-3 font-[500] pb-[2px]">$ 573, 700</p>
+                    <p class="col-span-3 font-[500] pb-[2px]">${
+                      property.tax
+                    }</p>
                 </div>
                 </div>
             </div>
@@ -241,17 +262,26 @@ export const propertyTemplate = ({ image }) => {
                     <div
                     class="grid grid-cols-12 font-[500] border-solid border-b-[2px]"
                     >
-                    <div class="col-span-5 pl-2">Owner</div>
-                    <div class="col-span-2 pl-2">Sale_Date</div>
-                    <div class="col-span-2 pl-2">Book_page</div>
-                    <div class="col-span-3 pl-2">Sale Price</div>
+                        <div class="col-span-5 pl-2">Owner</div>
+                        <div class="col-span-2 pl-2">Sale_Date</div>
+                        <div class="col-span-2 pl-2">Book_page</div>
+                        <div class="col-span-3 pl-2">Sale Price</div>
                     </div>
     
                     <div class="grid grid-cols-12 py-1 border-solid border-b-[1px]">
-                    <div class="col-span-5">Owner</div>
-                    <div class="col-span-2">Sale_Date</div>
-                    <div class="col-span-2">Book_page</div>
-                    <div class="col-span-3">Sale Price</div>
+                        <div class="col-span-5">Owner</div>
+                        <div class="col-span-2">Sale_Date</div>
+                        <div class="col-span-2">Book_page</div>
+                        <div class="col-span-3">Sale Price</div>
+                        ${property.sales_history
+                          .map(
+                            ({ owner, sale_date, book_page, sale_price }) => `
+                              <div class="col-span-5">${owner}</div>
+                              <div class="col-span-2">${sale_date}</div>
+                              <div class="col-span-2">${book_page}</div>
+                              <div class="col-span-3">${sale_price}</div>`
+                          )
+                          .join("")}
                     </div>
                 </div>
                 </div>
@@ -263,16 +293,59 @@ export const propertyTemplate = ({ image }) => {
                     Deed
                 </div>
                 <div class="p-2 text-center">
-                    <div
-                    class="grid grid-cols-12 font-[500] border-solid border-b-[2px]"
-                    >
-                    <div class="col-span-3">Owner</div>
-                    <div class="col-span-9">Sale_Date</div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">PDF</p>
+                        <a
+                            target="_blank"
+                            rel="noreferrer"
+                            href=${deed.deed_url}
+                        >
+                            <img
+                            alt="deed_pdf"
+                            width="30"
+                            height="30"
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQT6e_7m1x2QVNQ3IoIdmzv0mcoCKhRUyhG4182nUNLYRhPgW5MufGgl_zffZ3Aw5b5-Sc&s"
+                            ></img>
+                        </a>
                     </div>
-    
-                    <div class="grid grid-cols-12 py-1 border-solid border-b-[2px]">
-                    <div class="col-span-3">Seller</div>
-                    <div class="col-span-9">Allen J.White</div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">Book-Page</p>
+                        <p class="col-span-5 pb-[2px]">
+                            ${deed.deed_page}
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">Seller</p>
+                        <p class="col-span-5 pb-[2px]">${deed.seller}</p>
+                    </div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">Buyer</p>
+                        <p class="col-span-5 pb-[2px]">${deed.buyer}</p>
+                    </div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">Sale Price</p>
+                        <p class="col-span-5 pb-[2px]">
+                            ${deed.sale_price}
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">Deed of Date</p>
+                        <p class="col-span-5 pb-[2px]">
+                            ${deed.deed_date}
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">Land Description</p>
+                        <p class="col-span-5 pb-[2px]">
+                            ${deed.land_description}
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-8 pb-3 gap-5">
+                        <p class="col-span-3 font-[500] pb-[2px]">Other Covenants
+                        </p>
+                        <p class="col-span-5 pb-[2px]">
+                            ${deed.other_covenants}
+                        </p>
                     </div>
                 </div>
                 </div>

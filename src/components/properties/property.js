@@ -2,11 +2,11 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { sessionStorage as storage } from "js-storage";
-import Header from "./header";
-import DeedModal from "./deedModal";
+import Header from "../common/header";
 import { saveAs } from "file-saver";
-import { propertyTemplate } from "./html_templates/property_template";
-import BookPageModal from "./BookPageModal";
+import { propertyTemplate } from "../html_templates/property_template";
+import BookPageModal from "../modal/BookPageModal";
+import DeedModal from "../modal/deedModal";
 
 const Property = () => {
   const { search } = useLocation();
@@ -59,6 +59,8 @@ const Property = () => {
 
       const htmlContent = propertyTemplate({
         image: property.map_link,
+        property_info: property,
+        deed_info: storage.get(property_id).deed,
       });
 
       const blob = new Blob([htmlContent], { type: "text/html" });

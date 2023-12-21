@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./components/home";
-import Properties from "./components/properties";
-import Property from "./components/property";
+import Properties from "./components/properties/properties";
+import Property from "./components/properties/property";
 import { createContext, useState } from "react";
 import { sessionStorage as storage } from "js-storage";
 import BlankPage from "./components/404";
