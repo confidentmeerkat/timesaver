@@ -54,22 +54,11 @@ const Property = () => {
 
   const handleReport = () => {
     if (!!storage.get(property_id).deed) {
-      const property_urls = [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKBt3cOuKwJa7__rvWkIdyOcgEJGj4elmJQA&usqp=CAU",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIw-6y2Hi0q6J2qFo0IEaqhLZp5KHtZgaYzw&usqp=CAU",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoO451Ny6lJjmZ8F8Q4ew6V227uDJ3JXhyqw&usqp=CAU",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr9-O7wd15WsxmOxC5mRbJ3XAqei0dVzuGxw&usqp=CAU",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVwoRiEY_PqV_cZOUFWub-r2WoKqTfU_SrWQ&usqp=CAU",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkwi4PzHlfkjL07lnR0J8HKNL34vOIG0nxKA&usqp=CAU",
-      ];
-
       const name = "John Doe";
       const age = 34;
 
       const htmlContent = propertyTemplate({
-        title: property.address,
-        name,
-        age,
+        image: property.map_link,
       });
 
       const blob = new Blob([htmlContent], { type: "text/html" });
@@ -99,7 +88,9 @@ const Property = () => {
             <div className="mt-3 border-t border-gray-100">
               <dl className="divide-y divide-gray-100">
                 <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <img src={property.map_link} alt="property-image" />
+                  <a target="_blank" href={property.map_link}>
+                    <img src={property.map_link} alt="property-image" />
+                  </a>
                 </div>
                 <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                   <dt className="text-sm font-medium leading-6 text-gray-900">
