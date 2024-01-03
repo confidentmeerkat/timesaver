@@ -255,7 +255,7 @@ def getDeeds(
             f.write(response.content)
         try:
             ocred_text = ocr(os.path.abspath(f"temp/{random_string}.pdf"))
-            seller, buyer, sale_price, land_description, other_covenants = chatgpt(
+            seller, buyer, sale_price, land_description, other_covenants, land_plan_book, land_plan_page, prior_deed_book, prior_deed_page = chatgpt(
                 ocred_text
             )
             ocred_result["seller"] = seller
@@ -263,8 +263,23 @@ def getDeeds(
             ocred_result["sale_price"] = sale_price
             ocred_result["land_description"] = land_description
             ocred_result["other_covenants"] = other_covenants
+            ocred_result["land_plan_book"] = land_plan_book
+            ocred_result["land_plan_page"] = land_plan_page
+            ocred_result["prior_deed_book"] = prior_deed_book
+            ocred_result["prior_deed_page"] = prior_deed_page
             ocred_result["deeds_count"] = len(deeds_urls)
             ocred_result["deed_url"] = SearchBarnstable_Base_URL + pdf_url
+            ocred_result["deed_page"] = deed_page
+            if land_plan_book is not None and land_plan_page is not None:
+                response = requests.get(f"https://search.barnstabledeeds.org/ALIS/WW400R.HTM?W9PBK={land_plan_book}&W9PPG={land_plan_page}&W9PPG2=&WSHTNM=WW409P00&WSIQTP=RP09AP&WSKYCD=P&WSWVER=2&W9ABR=*RP&W9INQ=RP&W9MBGP=RP#schTerms")
+                soup = BeautifulSoup(response.text, "html.parser")
+                tr_els = soup.find("div", {"class": "mainContent"}).find("table").find_all("tr")
+                if len(tr_els) > 3:
+                    url = tr_els[1].find("td").find("a")["href"]
+                    response = requests.get(url)
+                    soup = BeautifulSoup(response.text, "html.parser")
+                    land_plan_pdf_url = soup.find("a", text="View the Image")["href"]
+                    ocred_result["land_plan_pdf_url"] = land_plan_pdf_url
         except:
             pass
         finally:
@@ -273,14 +288,3 @@ def getDeeds(
         ocred_result["deeds_count"] = 0
 
     return ocred_result
-
-
-@router.post("/report")
-def report():
-    # document = Document()
-
-    # document.add_paragraph("This is a sample Word document.")
-
-    # document.save("output.docx")
-
-    return "Hello"

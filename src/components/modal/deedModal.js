@@ -4,13 +4,17 @@ import axios from "axios";
 import { sessionStorage as storage } from "js-storage";
 
 const DeedModal = ({ open, onClose, name, date, page, book }) => {
+  const [deedBook, setDeedBook] = useState(book);
+  const [deedPage, setDeedPage] = useState(page);
   const property_id = new URL(window.location.href).searchParams.get(
     "property_id"
   );
   const [loaded, setLoaded] = useState(
-    page ? false : !!storage.get(property_id).deed
+    deedPage ? false : !!storage.get(property_id).deed
   );
-  const [data, setData] = useState(page ? {} : storage.get(property_id).deed);
+  const [data, setData] = useState(
+    deedPage ? {} : storage.get(property_id).deed
+  );
 
   useEffect(() => {
     if (!loaded)
@@ -19,19 +23,25 @@ const DeedModal = ({ open, onClose, name, date, page, book }) => {
           params: {
             ownername: name,
             deed_date: date,
-            page,
-            book,
+            page: deedPage,
+            book: deedBook,
           },
         })
         .then(({ data }) => {
           setLoaded(true);
           setData(data);
-          if (!page)
+          if (!deedPage)
             storage.set({
               [property_id]: { ...storage.get(property_id), deed: data },
             });
         });
-  }, [name, date]);
+  }, [name, date, deedBook, deedPage]);
+
+  const handleGoToPriorDeed = (book, page) => {
+    setLoaded(false);
+    setDeedBook(book);
+    setDeedPage(page);
+  };
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -101,7 +111,9 @@ const DeedModal = ({ open, onClose, name, date, page, book }) => {
                               </dt>
                               <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                                 <span className="flex-grow">
-                                  {page ? book + "-" + page : data.deed_page}
+                                  {deedPage
+                                    ? deedBook + "-" + deedPage
+                                    : data.deed_page}
                                 </span>
                               </dd>
                             </div>
@@ -151,6 +163,30 @@ const DeedModal = ({ open, onClose, name, date, page, book }) => {
                                 </span>
                               </dd>
                             </div>
+                            {data.prior_deed_book && (
+                              <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                <dt className="text-sm font-medium leading-6 text-gray-900">
+                                  Prior Deed
+                                </dt>
+                                <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                  <span className="flex-grow">
+                                    <button
+                                      type="button"
+                                      className="inline-flex justify-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                                      onClick={() =>
+                                        handleGoToPriorDeed(
+                                          data.prior_deed_book,
+                                          data.prior_deed_page
+                                        )
+                                      }
+                                    >
+                                      Book-Page: {data.prior_deed_book} -{" "}
+                                      {data.prior_deed_page}
+                                    </button>
+                                  </span>
+                                </dd>
+                              </div>
+                            )}
                             <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                               <dt className="text-sm font-medium leading-6 text-gray-900">
                                 Other Covenants
@@ -159,6 +195,25 @@ const DeedModal = ({ open, onClose, name, date, page, book }) => {
                                 <span className="flex-grow">
                                   {data.other_covenants}
                                 </span>
+                              </dd>
+                            </div>
+                            <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                              <dt className="text-sm font-medium leading-6 text-gray-900">
+                                Land Plan
+                              </dt>
+                              <dd className="mt-1 flex justify-center text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                <a
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  href={data.deed_url}
+                                >
+                                  <img
+                                    alt="deed_pdf"
+                                    width={50}
+                                    height={50}
+                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQT6e_7m1x2QVNQ3IoIdmzv0mcoCKhRUyhG4182nUNLYRhPgW5MufGgl_zffZ3Aw5b5-Sc&s"
+                                  ></img>
+                                </a>
                               </dd>
                             </div>
                           </dl>

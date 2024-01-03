@@ -14,7 +14,7 @@ def parse_pdf_file(filename):
     while True:
         try:
             images = pdf2img(filename)
-            return ocr(images[0])
+            return ocr(images[0]) + "\n" + ocr(images[1])
         except Exception as e:
             print(str(e))
 
