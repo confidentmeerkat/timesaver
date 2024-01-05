@@ -176,6 +176,13 @@ def getDeeds(
                     results.append(SearchBarnstable_Base_URL + deed_url[1:])
         return deed_page, results
 
+    def extract_number_fron_text(text):
+        match = re.search(r'\d+', text)
+        if match:
+            first_number = match.group()
+            return first_number
+        return None
+
     deeds_urls = []
     deed_page = ""
     ocred_result = {}
@@ -263,10 +270,10 @@ def getDeeds(
             ocred_result["sale_price"] = sale_price
             ocred_result["land_description"] = land_description
             ocred_result["other_covenants"] = other_covenants
-            ocred_result["land_plan_book"] = int(land_plan_book)
-            ocred_result["land_plan_page"] = int(land_plan_page)
-            ocred_result["prior_deed_book"] = int(prior_deed_book)
-            ocred_result["prior_deed_page"] = int(prior_deed_page)
+            ocred_result["land_plan_book"] = extract_number_fron_text(land_plan_book)
+            ocred_result["land_plan_page"] = extract_number_fron_text(land_plan_page)
+            ocred_result["prior_deed_book"] = extract_number_fron_text(prior_deed_book)
+            ocred_result["prior_deed_page"] = extract_number_fron_text(prior_deed_page)
             ocred_result["deeds_count"] = len(deeds_urls)
             ocred_result["deed_url"] = SearchBarnstable_Base_URL + pdf_url
             ocred_result["deed_page"] = deed_page

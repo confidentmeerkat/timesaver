@@ -14,11 +14,11 @@ const Report = () => {
     "property_id"
   );
 
-  const image = storage.get(property_id).map_link;
-  const property = storage.get(property_id);
+  const image = storage.get(property_id)?.map_link || "";
+  const property = storage.get(property_id) || { sales_history: [] };
   const deed = {
-    ...storage.get(property_id).deed,
-    deed_date: storage.get(property_id).sales_history[0].sale_date,
+    ...(storage.get(property_id)?.deed || {}),
+    deed_date: storage.get(property_id)?.sales_history[0].sale_date || "",
   };
 
   const handleDownloadAsHTML = () => {
@@ -50,12 +50,12 @@ const Report = () => {
             Back to property page
           </button>
         </div>
-        <button
+        {/* <button
           type="submit"
           className="block rounded-md mr-5 bg-gray-900 mb-5 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           PDF
-        </button>
+        </button> */}
         <button
           type="submit"
           className="block rounded-md bg-gray-900 mb-5 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
