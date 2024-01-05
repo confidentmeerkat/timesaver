@@ -163,7 +163,7 @@ const DeedModal = ({ open, onClose, name, date, page, book }) => {
                                 </span>
                               </dd>
                             </div>
-                            {data.prior_deed_book && (
+                            {data.prior_deed_book && data.prior_deed_page && (
                               <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                 <dt className="text-sm font-medium leading-6 text-gray-900">
                                   Prior Deed
@@ -197,25 +197,27 @@ const DeedModal = ({ open, onClose, name, date, page, book }) => {
                                 </span>
                               </dd>
                             </div>
-                            <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                              <dt className="text-sm font-medium leading-6 text-gray-900">
-                                Land Plan
-                              </dt>
-                              <dd className="mt-1 flex justify-center text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                                <a
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  href={data.deed_url}
-                                >
-                                  <img
-                                    alt="deed_pdf"
-                                    width={50}
-                                    height={50}
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQT6e_7m1x2QVNQ3IoIdmzv0mcoCKhRUyhG4182nUNLYRhPgW5MufGgl_zffZ3Aw5b5-Sc&s"
-                                  ></img>
-                                </a>
-                              </dd>
-                            </div>
+                            {data.land_plan_pdf_url && (
+                              <div className="px-2 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                <dt className="text-sm font-medium leading-6 text-gray-900">
+                                  Land Plan
+                                </dt>
+                                <dd className="mt-1 flex justify-center text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                                  <a
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href={data.land_plan_pdf_url}
+                                  >
+                                    <img
+                                      alt="deed_pdf"
+                                      width={50}
+                                      height={50}
+                                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQT6e_7m1x2QVNQ3IoIdmzv0mcoCKhRUyhG4182nUNLYRhPgW5MufGgl_zffZ3Aw5b5-Sc&s"
+                                    ></img>
+                                  </a>
+                                </dd>
+                              </div>
+                            )}
                           </dl>
                         </div>
                       </div>

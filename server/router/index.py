@@ -92,16 +92,16 @@ def getProperty(url: Union[str, None] = None):
     property_address = property_address1 + ", " + property_address2
     property["address"] = property_address
     owner_name = (
-        re.search(r"Owner Name as of 1/1/23:\n.*\n(.*)", owner_info).group(1).strip()
+        re.search(r"Owner Name as of 1/1/24:\n.*\n(.*)", owner_info).group(1).strip()
     )
     property["owner"] = owner_name
     owner_address1 = (
-        re.search(r"Owner Name as of 1/1/23:\n.*\n.*\n.*\n(.*)", owner_info)
+        re.search(r"Owner Name as of 1/1/24:\n.*\n.*\n.*\n(.*)", owner_info)
         .group(1)
         .strip()
     )
     owner_address2 = (
-        re.search(r"Owner Name as of 1/1/23:\n.*\n.*\n.*\n.*\n.*\n(.*)", owner_info)
+        re.search(r"Owner Name as of 1/1/24:\n.*\n.*\n.*\n.*\n.*\n(.*)", owner_info)
         .group(1)
         .strip()
     )
@@ -263,10 +263,10 @@ def getDeeds(
             ocred_result["sale_price"] = sale_price
             ocred_result["land_description"] = land_description
             ocred_result["other_covenants"] = other_covenants
-            ocred_result["land_plan_book"] = land_plan_book
-            ocred_result["land_plan_page"] = land_plan_page
-            ocred_result["prior_deed_book"] = prior_deed_book
-            ocred_result["prior_deed_page"] = prior_deed_page
+            ocred_result["land_plan_book"] = int(land_plan_book)
+            ocred_result["land_plan_page"] = int(land_plan_page)
+            ocred_result["prior_deed_book"] = int(prior_deed_book)
+            ocred_result["prior_deed_page"] = int(prior_deed_page)
             ocred_result["deeds_count"] = len(deeds_urls)
             ocred_result["deed_url"] = SearchBarnstable_Base_URL + pdf_url
             ocred_result["deed_page"] = deed_page
@@ -280,8 +280,8 @@ def getDeeds(
                     soup = BeautifulSoup(response.text, "html.parser")
                     land_plan_pdf_url = soup.find("a", text="View the Image")["href"]
                     ocred_result["land_plan_pdf_url"] = land_plan_pdf_url
-        except:
-            pass
+        except Exception as e:
+            print(e)
         finally:
             os.remove(f"temp/{random_string}.pdf")
     else:

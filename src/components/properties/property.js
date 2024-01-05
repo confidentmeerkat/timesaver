@@ -1,16 +1,15 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { sessionStorage as storage } from "js-storage";
 import Header from "../common/header";
-import { saveAs } from "file-saver";
-import { propertyTemplate } from "../html_templates/property_template";
 import BookPageModal from "../modal/BookPageModal";
 import DeedModal from "../modal/deedModal";
 
+const urlRegex = /(https?:\/\/[^\s]+)/g;
+
 const Property = () => {
   const { search } = useLocation();
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
   const details_url = search.match(urlRegex);
   const property_id = new URL(window.location.href).searchParams.get(
     "property_id"
@@ -52,20 +51,10 @@ const Property = () => {
         });
   }, [details_url]);
 
+  const navigate = useNavigate();
   const handleReport = () => {
     if (!!storage.get(property_id).deed) {
-      const htmlContent = propertyTemplate({
-        image: property.map_link,
-        property_info: property,
-        deed_info: {
-          ...storage.get(property_id).deed,
-          deed_date: property.sales_history[0].sale_date,
-        },
-      });
-
-      const blob = new Blob([htmlContent], { type: "text/html" });
-      const fileName = property.address;
-      saveAs(blob, fileName);
+      navigate(`/report?property_id=${property_id}&details_url=${details_url}`);
     }
   };
 
